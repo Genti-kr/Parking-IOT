@@ -1,0 +1,37 @@
+# Node / React
+node_modules/
+dist/
+build/
+.env
+.env.local
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+appsettings.Development.json
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.mdf
+*.ldf
+*.bak
+
+# IDE
+.vs/
