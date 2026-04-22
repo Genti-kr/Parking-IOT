@@ -4,16 +4,41 @@ import api from "../services/api.js";
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadStats = () => {
+    setError("");
+    setLoading(true);
     api
       .get("/dashboard/stats")
       .then((res) => setStats(res.data))
-      .catch((err) => setError(err.response?.data?.message || "Gabim ne ngarkim"));
+      .catch((err) => setError(err.response?.data?.message || "Gabim ne ngarkim"))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadStats();
   }, []);
 
-  if (error) return <div className="error">{error}</div>;
-  if (!stats) return <div className="loading">Duke u ngarkuar...</div>;
+  if (error) {
+    return (
+      <div className="state-card">
+        <div className="state-banner state-error">{error}</div>
+        <button className="btn btn-primary" onClick={loadStats}>
+          Provo perseri
+        </button>
+      </div>
+    );
+  }
+
+  if (loading || !stats) {
+    return (
+      <div className="state-card">
+        <div className="spinner" aria-hidden="true" />
+        <p>Duke u ngarkuar te dhenat e dashboard-it...</p>
+      </div>
+    );
+  }
 
   const cards = [
     { label: "Totali i vendeve", value: stats.totalSlots },
@@ -24,8 +49,13 @@ export default function Dashboard() {
   ];
 
   return (
-    <div>
-      <h2>Dashboard</h2>
+    <section>
+      <div className="section-head">
+        <h3 className="section-title">Dashboard</h3>
+        <button className="btn btn-secondary" onClick={loadStats}>
+          Rifresko
+        </button>
+      </div>
       <div className="stats-grid">
         {cards.map((c) => (
           <div className="stat-card" key={c.label}>
@@ -34,6 +64,6 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

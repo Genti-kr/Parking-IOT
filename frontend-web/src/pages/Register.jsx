@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
-export default function Login() {
-  const { login } = useAuth();
+export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -15,11 +16,12 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setBusy(true);
+
     try {
-      await login(email, password);
+      await register({ fullName, email, password, phoneNumber });
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Login i pasakte");
+      setError(err.response?.data?.message || "Regjistrimi deshtoi.");
     } finally {
       setBusy(false);
     }
@@ -28,8 +30,18 @@ export default function Login() {
   return (
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
-        <h2>Smart Parking</h2>
-        <p className="subtitle">Kyqu ne panelin e administrimit</p>
+        <h2>Krijo llogari</h2>
+        <p className="subtitle">Regjistrohu per te perdorur Smart Parking</p>
+
+        <label>Emri i plote</label>
+        <input
+          type="text"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="Emri Mbiemri"
+          autoComplete="name"
+          required
+        />
 
         <label>Email</label>
         <input
@@ -46,9 +58,19 @@ export default function Login() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="********"
-          autoComplete="current-password"
+          placeholder="Minimum 6 karaktere"
+          autoComplete="new-password"
+          minLength={6}
           required
+        />
+
+        <label>Numri i telefonit (opsionale)</label>
+        <input
+          type="tel"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+          placeholder="+383 44 123 456"
+          autoComplete="tel"
         />
 
         {error && (
@@ -58,11 +80,11 @@ export default function Login() {
         )}
 
         <button className="btn btn-primary" type="submit" disabled={busy}>
-          {busy ? "Duke u kyqur..." : "Kyqu"}
+          {busy ? "Duke u regjistruar..." : "Regjistrohu"}
         </button>
 
         <p className="auth-switch">
-          Nuk ke llogari? <Link to="/register">Regjistrohu ketu</Link>
+          Ke llogari? <Link to="/login">Kyqu ketu</Link>
         </p>
       </form>
     </div>
