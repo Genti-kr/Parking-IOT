@@ -48,7 +48,7 @@ public class ParkingController : ControllerBase
     }
 
     [HttpGet("dashboard/stats")]
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> Stats() => Ok(await _parking.GetStatsAsync());
 
     [HttpGet("reservations")]
@@ -67,7 +67,7 @@ public class ParkingController : ControllerBase
     }
 
     [HttpPatch("reservations/{id:int}/status")]
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> UpdateReservationStatus(int id, [FromBody] ReservationStatusUpdateRequest request)
     {
         var result = await _parking.UpdateReservationStatusAsync(id, request.Status);
