@@ -1,0 +1,164 @@
+Hyrje Përshkrim i shkurtër i problemit të parkimit dhe pse nevojitet sistemi.
+
+Qëllimi i projektit Çfarë synon të arrijë sistemi.
+
+Objektivat Ndaji në:
+
+Funksionale
+Jo-funksionale
+Scope dhe MVP Përcakto çfarë hyn në versionin e parë. P.sh. për MVP:
+menaxhimi i vendeve të parkimit
+hyrje/dalje e veturave
+tarifimi bazik
+dashboard admin
+shfaqja e vendeve të lira
+Aktorët e sistemit
+Admin
+Operator
+Resident
+Guest
+IoT Device
+AI Service
+Kërkesat funksionale P.sh.:
+sistemi duhet të tregojë vendet e lira
+sistemi duhet të regjistrojë hyrjen/daljen
+sistemi duhet të llogarisë tarifën
+sistemi duhet të ruajë historikun
+Kërkesat jo-funksionale P.sh.:
+API response < 500ms
+update i slot-it < 2s
+autentifikim me JWT
+disponueshmëri e lartë
+Use Cases Për secilin aktor:
+rezervo parkim
+hy në parking
+dil nga parkingu
+admin shikon statistika
+sensori përditëson slot-in
+Arkitektura e sistemit Shpjego shtresat:
+IoT
+Backend
+Database
+Web
+Mobile
+AI
+Database Design
+tabelat
+relacionet
+përshkrimi i secilës tabelë
+API Design Për endpoint-et kryesore:
+request
+response
+status codes
+UI / Modulet kryesore
+dashboard admin
+parking view
+mobile app screen ideas
+Siguria
+JWT
+HTTPS
+role-based access
+encryption
+Testimi
+testim i API
+testim i databazës
+testim i skenarëve kryesorë
+Rreziqet dhe kufizimet P.sh.:
+saktësia e ANPR
+dështimi i sensorëve
+mungesa e hardware real
+Përfundimi
+Si të fillosh në javën e parë
+Java e parë duhet të fokusohet te baza e sistemit, jo te AI apo Flutter.
+
+Dita 1
+Përcakto qartë:
+
+emrin final të projektit
+scope-in
+MVP-në
+rolet e përdoruesve
+Output:
+
+1 faqe me përshkrimin e projektit
+lista e funksioneve që hynë në versionin e parë
+Dita 2
+Shkruaj:
+
+kërkesat funksionale
+kërkesat jo-funksionale
+use cases kryesore
+Output:
+
+seksionet Requirements dhe Use Cases
+Dita 3
+Dizajno databazën fillestare. Fillimisht mjaftojnë këto tabela:
+
+Users
+ParkingSlots
+ParkingSessions
+Zones
+Reservations nëse do rezervim qysh në MVP
+Output:
+
+ER diagram
+përshkrim i tabelave
+Dita 4
+Defino backend-in:
+
+teknologjia ASP.NET Core Web API
+endpoint-et kryesore:
+POST /api/entry
+POST /api/exit
+GET /api/parking/available
+POST /api/slots/update
+GET /api/dashboard/stats
+Output:
+
+lista e endpoint-eve me request/response
+Dita 5
+Bëj strukturën teknike të projektit:
+
+krijo backend project
+krijo databazën
+krijo modelet bazë
+krijo endpoint-in e parë
+Output:
+
+projekti që starton lokalisht
+endpoint testues funksional
+Dita 6
+Ndërto logjikën bazë:
+
+krijimi i slot-eve
+marrja e vendeve të lira
+regjistrimi i hyrjes
+regjistrimi i daljes
+llogaritja e thjeshtë e tarifës
+Dita 7
+Dokumento çfarë ke bërë dhe planifiko javën e dytë:
+
+çfarë punon
+çfarë mungon
+çfarë hyn në fazën tjetër
+Renditja praktike e implementimit
+Mos e nis me AI, Flutter dhe IoT hardware. Nise kështu:
+
+Database
+Backend API
+Web dashboard i thjeshtë
+IoT integration
+AI ANPR
+Mobile app
+Kjo është rruga më e sigurt.
+
+Çfarë duhet të kesh gati në fund të javës së parë
+Duhet të kesh:
+
+dokumentin e strukturuar
+ER diagram
+use cases
+API design bazik
+backend skeleton në .NET
+databazën fillestare
+2-3 endpoint-e funksionale
