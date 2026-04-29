@@ -1,44 +1,22 @@
 import { useEffect, useState } from "react";
-import api from "../services/api.js";
+import { fetchDashboardStats } from "../services/mockData.js";
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const loadStats = () => {
-    setError("");
-    setLoading(true);
-    api
-      .get("/dashboard/stats")
-      .then((res) => setStats(res.data))
-      .catch((err) => setError(err.response?.data?.message || "Gabim ne ngarkim"))
-      .finally(() => setLoading(false));
-  };
+  const [source, setSource] = useState("api");
 
   useEffect(() => {
-    loadStats();
+    fetchDashboardStats()
+      .then((res) => {
+        setStats(res.data);
+        setSource(res.source);
+      })
+      .catch(() => setError("Gabim ne ngarkim"));
   }, []);
 
-  if (error) {
-    return (
-      <div className="state-card">
-        <div className="state-banner state-error">{error}</div>
-        <button className="btn btn-primary" onClick={loadStats}>
-          Provo perseri
-        </button>
-      </div>
-    );
-  }
-
-  if (loading || !stats) {
-    return (
-      <div className="state-card">
-        <div className="spinner" aria-hidden="true" />
-        <p>Duke u ngarkuar te dhenat e dashboard-it...</p>
-      </div>
-    );
-  }
+  if (error) return <div className="error">{error}</div>;
+  if (!stats) return <div className="loading">Duke u ngarkuar...</div>;
 
   const cards = [
     { label: "Totali i vendeve", value: stats.totalSlots },
@@ -49,13 +27,11 @@ export default function Dashboard() {
   ];
 
   return (
-    <section>
-      <div className="section-head">
-        <h3 className="section-title">Dashboard</h3>
-        <button className="btn btn-secondary" onClick={loadStats}>
-          Rifresko
-        </button>
-      </div>
+    <div>
+      <h2>Dashboard</h2>
+      {source === "mock" && (
+        <p className="info-banner">Po shfaqen te dhena demo (mock data).</p>
+      )}
       <div className="stats-grid">
         {cards.map((c) => (
           <div className="stat-card" key={c.label}>
@@ -64,6 +40,6 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

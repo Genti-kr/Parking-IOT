@@ -18,6 +18,9 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder b)
     {
+        b.Entity<ParkingSlot>().HasKey(s => s.SlotId);
+        b.Entity<ParkingSession>().HasKey(s => s.SessionId);
+
         b.Entity<User>().HasIndex(u => u.Email).IsUnique();
         b.Entity<Vehicle>().HasIndex(v => v.PlateNumber).IsUnique();
 

@@ -3,14 +3,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) {
-    return (
-      <div className="fullscreen-state">
-        <div className="spinner" aria-hidden="true" />
-        <p>Duke verifikuar sesionin...</p>
-      </div>
-    );
-  }
+  if (loading) return <div className="loading">Duke u ngarkuar...</div>;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }

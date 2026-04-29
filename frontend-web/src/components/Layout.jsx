@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Layout() {
@@ -13,27 +13,18 @@ export default function Layout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand-wrap">
-          <h1 className="brand">Smart Parking</h1>
-          <p className="brand-subtitle">Admin Console</p>
-        </div>
-        <nav className="sidebar-nav">
-          <NavLink to="/dashboard">Dashboard</NavLink>
-          <NavLink to="/parking">Parking</NavLink>
-          <NavLink to="/reservations">Reservations</NavLink>
+        <h1 className="brand">Smart Parking</h1>
+        <nav>
+          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/parking">Parking</Link>
+          <Link to="/reservations">Reservations</Link>
         </nav>
         <div className="user-box">
-          <span className="user-name">{user?.fullName || "Administrator"}</span>
-          <span className="user-role">{user?.role || "Operator"}</span>
-          <button className="btn btn-danger" onClick={handleLogout}>
-            Dil
-          </button>
+          <span>{user?.fullName}</span>
+          <button onClick={handleLogout}>Dil</button>
         </div>
       </aside>
       <main className="content">
-        <header className="page-header">
-          <h2 className="page-title">Parking Management</h2>
-        </header>
         <Outlet />
       </main>
     </div>

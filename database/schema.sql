@@ -2,12 +2,22 @@
 -- Smart Parking Management System
 -- Database Schema (SQL Server)
 -- =========================================================
+-- IMPLEMENTATION STEPS
+-- STEP 1: Core structure (roles, users, vehicles, zones, slots)
+-- STEP 2: Parking operations (sessions, reservations, payments, tariffs)
+-- STEP 3: IoT integration (sensors, device logs, ANPR logs)
+-- STEP 4: Administration and seed data
+-- =========================================================
 
--- CREATE DATABASE SmartParkingDB;
+-- CREATE DATABASE parkingIOT;
 -- GO
--- USE SmartParkingDB;
+-- USE parkingIOT;
 -- GO
 
+-- =========================================================
+-- STEP 1 - Core structure
+-- =========================================================
+-- 1.1 Roles
 -- =========================================================
 -- Roles
 -- =========================================================
@@ -18,6 +28,8 @@ CREATE TABLE Roles (
 );
 GO
 
+-- =========================================================
+-- 1.2 Users
 -- =========================================================
 -- Users
 -- =========================================================
@@ -36,6 +48,8 @@ CREATE TABLE Users (
 GO
 
 -- =========================================================
+-- 1.3 Vehicles
+-- =========================================================
 -- Vehicles
 -- =========================================================
 CREATE TABLE Vehicles (
@@ -51,6 +65,8 @@ CREATE TABLE Vehicles (
 GO
 
 -- =========================================================
+-- 1.4 Zones
+-- =========================================================
 -- Zones
 -- =========================================================
 CREATE TABLE Zones (
@@ -63,6 +79,8 @@ CREATE TABLE Zones (
 );
 GO
 
+-- =========================================================
+-- 1.5 ParkingSlots
 -- =========================================================
 -- ParkingSlots
 -- =========================================================
@@ -79,6 +97,10 @@ CREATE TABLE ParkingSlots (
 );
 GO
 
+-- =========================================================
+-- STEP 2 - Parking operations
+-- =========================================================
+-- 2.1 ParkingSessions
 -- =========================================================
 -- ParkingSessions
 -- =========================================================
@@ -100,6 +122,8 @@ CREATE TABLE ParkingSessions (
 GO
 
 -- =========================================================
+-- 2.2 Reservations
+-- =========================================================
 -- Reservations
 -- =========================================================
 CREATE TABLE Reservations (
@@ -119,6 +143,8 @@ CREATE TABLE Reservations (
 GO
 
 -- =========================================================
+-- 2.3 Payments
+-- =========================================================
 -- Payments
 -- =========================================================
 CREATE TABLE Payments (
@@ -136,6 +162,8 @@ CREATE TABLE Payments (
 GO
 
 -- =========================================================
+-- 2.4 Tariffs
+-- =========================================================
 -- Tariffs
 -- =========================================================
 CREATE TABLE Tariffs (
@@ -152,6 +180,10 @@ CREATE TABLE Tariffs (
 GO
 
 -- =========================================================
+-- STEP 3 - IoT integration
+-- =========================================================
+-- 3.1 SensorDevices
+-- =========================================================
 -- SensorDevices
 -- =========================================================
 CREATE TABLE SensorDevices (
@@ -166,6 +198,8 @@ CREATE TABLE SensorDevices (
 GO
 
 -- =========================================================
+-- 3.2 DeviceLogs
+-- =========================================================
 -- DeviceLogs
 -- =========================================================
 CREATE TABLE DeviceLogs (
@@ -178,6 +212,8 @@ CREATE TABLE DeviceLogs (
 );
 GO
 
+-- =========================================================
+-- 3.3 AnprLogs
 -- =========================================================
 -- AnprLogs
 -- =========================================================
@@ -192,6 +228,10 @@ CREATE TABLE AnprLogs (
 );
 GO
 
+-- =========================================================
+-- STEP 4 - Administration and seeds
+-- =========================================================
+-- 4.1 AuditLogs
 -- =========================================================
 -- AuditLogs
 -- =========================================================
@@ -208,6 +248,8 @@ CREATE TABLE AuditLogs (
 GO
 
 -- =========================================================
+-- 4.2 Indexes
+-- =========================================================
 -- Indexes
 -- =========================================================
 CREATE INDEX IX_Slots_Status       ON ParkingSlots(Status);
@@ -216,4 +258,90 @@ CREATE INDEX IX_Sessions_Entry     ON ParkingSessions(EntryTime);
 CREATE INDEX IX_Reservations_Time  ON Reservations(StartTime, EndTime);
 CREATE INDEX IX_Payments_Status    ON Payments(Status);
 CREATE INDEX IX_Anpr_Plate         ON AnprLogs(PlateNumber);
+GO
+
+-- =========================================================
+-- 4.3 Seed: Roles, Zones, users
+-- STEP 1 starts here with initial master data
+-- =========================================================
+-- Seed: Roles + users (optional)
+-- Password for both users: password
+-- =========================================================
+IF NOT EXISTS (SELECT 1 FROM Roles WHERE Name = 'Admin')
+BEGIN
+    INSERT INTO Roles (Name, Description)
+    VALUES ('Admin', 'Administrator i sistemit');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Roles WHERE Name = 'User')
+BEGIN
+    INSERT INTO Roles (Name, Description)
+    VALUES ('User', 'Perdorues standard i sistemit');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Roles WHERE Name = 'Operator')
+BEGIN
+    INSERT INTO Roles (Name, Description)
+    VALUES ('Operator', 'Stafi operativ i parkingut');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Roles WHERE Name = 'Resident')
+BEGIN
+    INSERT INTO Roles (Name, Description)
+    VALUES ('Resident', 'Banor rezident me tarifa speciale');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Zones WHERE Name = 'Zone A')
+BEGIN
+    INSERT INTO Zones (Name, Location, Capacity, HourlyRate)
+    VALUES ('Zone A', 'Hyrja kryesore', 20, 1.00);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Zones WHERE Name = 'Zone B')
+BEGIN
+    INSERT INTO Zones (Name, Location, Capacity, HourlyRate)
+    VALUES ('Zone B', 'Pjesa qendrore', 20, 1.00);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Zones WHERE Name = 'Zone C')
+BEGIN
+    INSERT INTO Zones (Name, Location, Capacity, HourlyRate)
+    VALUES ('Zone C', 'Dalja dhe pjesa e pasme', 20, 1.00);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'parking.iot.prishtine@gmail.com')
+BEGIN
+    INSERT INTO Users (FullName, Email, PhoneNumber, PasswordHash, RoleId, IsActive)
+    SELECT
+        'Admin',
+        'parking.iot.prishtine@gmail.com',
+        '+38344738192',
+        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        r.RoleId,
+        1
+    FROM Roles r
+    WHERE r.Name = 'Admin';
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'user.parking.iot.prishtine@gmail.com')
+BEGIN
+    INSERT INTO Users (FullName, Email, PhoneNumber, PasswordHash, RoleId, IsActive)
+    SELECT
+        'User',
+        'user.parking.iot.prishtine@gmail.com',
+        '+38349627415',
+        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        r.RoleId,
+        1
+    FROM Roles r
+    WHERE r.Name = 'User';
+END
 GO

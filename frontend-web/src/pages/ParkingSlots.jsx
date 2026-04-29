@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
-import api from "../services/api.js";
+import { fetchParkingSlots } from "../services/mockData.js";
 
 export default function ParkingSlots() {
   const [slots, setSlots] = useState([]);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState("api");
 
   const load = () => {
-    setError("");
-    setLoading(true);
-    api
-      .get("/parking/available")
-      .then((res) => setSlots(res.data))
-      .catch((err) => setError(err.response?.data?.message || "Gabim"))
-      .finally(() => setLoading(false));
+    fetchParkingSlots()
+      .then((res) => {
+        setSlots(res.data);
+        setSource(res.source);
+        setError("");
+      })
+      .catch(() => setError("Gabim ne ngarkim te vendeve"));
   };
 
   useEffect(() => {
@@ -23,45 +23,21 @@ export default function ParkingSlots() {
   }, []);
 
   return (
-    <section>
-      <div className="section-head">
-        <h3 className="section-title">Vendet e parkimit</h3>
-        <button className="btn btn-secondary" onClick={load}>
-          Rifresko
-        </button>
+    <div>
+      <h2>Vendet e lira te parkimit</h2>
+      {source === "mock" && (
+        <p className="info-banner">Po shfaqen te dhena demo (mock data).</p>
+      )}
+      {error && <div className="error">{error}</div>}
+      <div className="slots-grid">
+        {slots.map((s) => (
+          <div className={`slot slot-${s.status.toLowerCase()}`} key={s.slotId}>
+            <div className="slot-number">{s.slotNumber}</div>
+            <div className="slot-status">{s.status}</div>
+          </div>
+        ))}
+        {slots.length === 0 && <p>Nuk ka vende te lira momentalisht.</p>}
       </div>
-
-      {error && (
-        <div className="state-card">
-          <div className="state-banner state-error">{error}</div>
-          <button className="btn btn-primary" onClick={load}>
-            Provo perseri
-          </button>
-        </div>
-      )}
-
-      {!error && loading && (
-        <div className="state-card">
-          <div className="spinner" aria-hidden="true" />
-          <p>Duke u ngarkuar vendet...</p>
-        </div>
-      )}
-
-      {!error && !loading && (
-        <div className="slots-grid">
-          {slots.map((s) => (
-            <div className={`slot slot-${s.status.toLowerCase()}`} key={s.slotId}>
-              <div className="slot-number">{s.slotNumber}</div>
-              <div className="slot-status">{s.status}</div>
-            </div>
-          ))}
-          {slots.length === 0 && (
-            <div className="state-banner state-info">
-              Nuk ka vende te lira momentalisht.
-            </div>
-          )}
-        </div>
-      )}
-    </section>
+    </div>
   );
 }

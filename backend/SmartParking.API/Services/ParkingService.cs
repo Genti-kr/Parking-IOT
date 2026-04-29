@@ -13,6 +13,23 @@ public class ParkingService : IParkingService
 
     public ParkingService(AppDbContext db) => _db = db;
 
+    public async Task<IEnumerable<ParkingSlot>> GetSlotsAsync(string? status = null)
+    {
+        var query = _db.ParkingSlots
+            .Where(s => s.IsActive)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            var normalizedStatus = NormalizeStatus(status);
+            query = query.Where(s => s.Status == normalizedStatus);
+        }
+
+        return await query
+            .OrderBy(s => s.SlotNumber)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<ParkingSlot>> GetAvailableAsync()
     {
         return await _db.ParkingSlots
@@ -35,7 +52,14 @@ public class ParkingService : IParkingService
     public async Task<ParkingSession?> EntryAsync(EntryRequest request)
     {
         var slot = await _db.ParkingSlots.FindAsync(request.SlotId);
-        if (slot is null || slot.Status == "Occupied") return null;
+        if (slot is null || slot.Status is "Occupied" or "OutOfService") return null;
+
+        // If an active reservation exists for this slot, only the reservation owner can enter.
+        var activeReservation = await _db.Reservations
+            .Where(r => r.SlotId == request.SlotId && (r.Status == "Confirmed" || r.Status == "Pending"))
+            .OrderBy(r => r.StartTime)
+            .FirstOrDefaultAsync();
+        if (activeReservation is not null && request.UserId != activeReservation.UserId) return null;
 
         int? vehicleId = null;
         if (!string.IsNullOrWhiteSpace(request.PlateNumber))
@@ -90,6 +114,113 @@ public class ParkingService : IParkingService
         return session;
     }
 
+    public async Task<IEnumerable<ReservationDto>> GetReservationsAsync(string? status = null)
+    {
+        var query = _db.Reservations.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            var normalizedStatus = NormalizeReservationStatus(status);
+            query = query.Where(r => r.Status == normalizedStatus);
+        }
+
+        return await query
+            .OrderByDescending(r => r.StartTime)
+            .Select(r => new ReservationDto(
+                r.ReservationId,
+                r.UserId,
+                r.SlotId,
+                r.VehicleId,
+                r.StartTime,
+                r.EndTime,
+                r.Status))
+            .ToListAsync();
+    }
+
+    public async Task<ReservationDto?> CreateReservationAsync(ReservationCreateRequest request)
+    {
+        if (request.EndTime <= request.StartTime) return null;
+
+        var slot = await _db.ParkingSlots.FindAsync(request.SlotId);
+        if (slot is null || !slot.IsActive || slot.Status is "Occupied" or "OutOfService") return null;
+
+        var hasOverlap = await _db.Reservations.AnyAsync(r =>
+            r.SlotId == request.SlotId &&
+            (r.Status == "Pending" || r.Status == "Confirmed") &&
+            request.StartTime < r.EndTime &&
+            request.EndTime > r.StartTime);
+
+        if (hasOverlap) return null;
+
+        var reservation = new Reservation
+        {
+            UserId = request.UserId,
+            SlotId = request.SlotId,
+            VehicleId = request.VehicleId,
+            StartTime = request.StartTime,
+            EndTime = request.EndTime,
+            Status = "Pending"
+        };
+
+        _db.Reservations.Add(reservation);
+        if (slot.Status == "Free")
+        {
+            slot.Status = "Reserved";
+            slot.LastUpdate = DateTime.UtcNow;
+        }
+
+        await _db.SaveChangesAsync();
+
+        return new ReservationDto(
+            reservation.ReservationId,
+            reservation.UserId,
+            reservation.SlotId,
+            reservation.VehicleId,
+            reservation.StartTime,
+            reservation.EndTime,
+            reservation.Status);
+    }
+
+    public async Task<ReservationDto?> UpdateReservationStatusAsync(int reservationId, string status)
+    {
+        var reservation = await _db.Reservations.FindAsync(reservationId);
+        if (reservation is null) return null;
+
+        reservation.Status = NormalizeReservationStatus(status);
+
+        var slot = await _db.ParkingSlots.FindAsync(reservation.SlotId);
+        if (slot is not null)
+        {
+            if (reservation.Status is "Cancelled" or "Completed")
+            {
+                if (slot.Status != "Occupied")
+                {
+                    slot.Status = "Free";
+                    slot.LastUpdate = DateTime.UtcNow;
+                }
+            }
+            else if (reservation.Status is "Pending" or "Confirmed")
+            {
+                if (slot.Status == "Free")
+                {
+                    slot.Status = "Reserved";
+                    slot.LastUpdate = DateTime.UtcNow;
+                }
+            }
+        }
+
+        await _db.SaveChangesAsync();
+
+        return new ReservationDto(
+            reservation.ReservationId,
+            reservation.UserId,
+            reservation.SlotId,
+            reservation.VehicleId,
+            reservation.StartTime,
+            reservation.EndTime,
+            reservation.Status);
+    }
+
     public async Task<DashboardStats> GetStatsAsync()
     {
         var total = await _db.ParkingSlots.CountAsync(s => s.IsActive);
@@ -121,6 +252,20 @@ public class ParkingService : IParkingService
             "reserved" => "Reserved",
             "outofservice" => "OutOfService",
             _ => "Free"
+        };
+    }
+
+    private static string NormalizeReservationStatus(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "pending" => "Pending",
+            "confirmed" => "Confirmed",
+            "active" => "Active",
+            "completed" => "Completed",
+            "cancelled" => "Cancelled",
+            "canceled" => "Cancelled",
+            _ => "Pending"
         };
     }
 }
