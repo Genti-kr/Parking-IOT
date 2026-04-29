@@ -13,6 +13,10 @@ public class ParkingController : ControllerBase
 
     public ParkingController(IParkingService parking) => _parking = parking;
 
+    [HttpGet("parking/slots")]
+    public async Task<IActionResult> GetSlots([FromQuery] string? status)
+        => Ok(await _parking.GetSlotsAsync(status));
+
     [HttpGet("parking/available")]
     public async Task<IActionResult> GetAvailable()
         => Ok(await _parking.GetAvailableAsync());
@@ -46,4 +50,29 @@ public class ParkingController : ControllerBase
     [HttpGet("dashboard/stats")]
     [Authorize]
     public async Task<IActionResult> Stats() => Ok(await _parking.GetStatsAsync());
+
+    [HttpGet("reservations")]
+    [Authorize]
+    public async Task<IActionResult> GetReservations([FromQuery] string? status)
+        => Ok(await _parking.GetReservationsAsync(status));
+
+    [HttpPost("reservations")]
+    [Authorize]
+    public async Task<IActionResult> CreateReservation([FromBody] ReservationCreateRequest request)
+    {
+        var result = await _parking.CreateReservationAsync(request);
+        return result is null
+            ? BadRequest(new { message = "Rezervimi deshtoi: orari ose vendi nuk eshte valid." })
+            : Ok(result);
+    }
+
+    [HttpPatch("reservations/{id:int}/status")]
+    [Authorize]
+    public async Task<IActionResult> UpdateReservationStatus(int id, [FromBody] ReservationStatusUpdateRequest request)
+    {
+        var result = await _parking.UpdateReservationStatusAsync(id, request.Status);
+        return result is null
+            ? NotFound(new { message = "Rezervimi nuk u gjet." })
+            : Ok(result);
+    }
 }
