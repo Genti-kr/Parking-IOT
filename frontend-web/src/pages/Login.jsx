@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Login() {
@@ -25,10 +25,12 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
-      <form className="login-card" onSubmit={handleSubmit}>
+    <div className="auth-page">
+      <div className="auth-bg-glow auth-bg-glow-1" />
+      <div className="auth-bg-glow auth-bg-glow-2" />
+      <form className="auth-card" onSubmit={handleSubmit}>
         <h2>Smart Parking</h2>
-        <p className="subtitle">Kyqu ne panelin e administrimit</p>
+        <p className="subtitle">Log in to the administration panel</p>
 
         <label>Email</label>
         <input
@@ -48,9 +50,11 @@ export default function Login() {
 
         {error && <div className="error">{error}</div>}
 
-        <button type="submit" disabled={busy}>
-          {busy ? "Duke u kyqur..." : "Kyqu"}
-        </button>
+        <button type="submit" disabled={busy}>{busy ? "Signing in..." : "Log in"}</button>
+
+        <p className="auth-footer">
+          New here? <Link to="/register">Create an account</Link>
+        </p>
       </form>
     </div>
   );
