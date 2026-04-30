@@ -21,6 +21,38 @@ public class ParkingService : IParkingService
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<ReservationListItem>> GetReservationsAsync(int? userId, bool includeAll)
+    {
+        var reservations = _db.Reservations.AsNoTracking();
+
+        if (!includeAll)
+        {
+            if (userId is null)
+            {
+                return Array.Empty<ReservationListItem>();
+            }
+
+            reservations = reservations.Where(r => r.UserId == userId.Value);
+        }
+
+        return await (
+            from reservation in reservations
+            join user in _db.Users.AsNoTracking() on reservation.UserId equals user.UserId
+            join slot in _db.ParkingSlots.AsNoTracking() on reservation.SlotId equals slot.SlotId
+            join vehicle in _db.Vehicles.AsNoTracking() on reservation.VehicleId equals vehicle.VehicleId into vehicleGroup
+            from vehicle in vehicleGroup.DefaultIfEmpty()
+            orderby reservation.StartTime descending
+            select new ReservationListItem(
+                reservation.ReservationId,
+                user.FullName,
+                vehicle != null ? vehicle.PlateNumber : null,
+                slot.SlotNumber,
+                reservation.StartTime,
+                reservation.EndTime,
+                reservation.Status))
+            .ToListAsync();
+    }
+
     public async Task<bool> UpdateSlotStatusAsync(SlotUpdateRequest request)
     {
         var slot = await _db.ParkingSlots.FindAsync(request.SlotId);
@@ -32,7 +64,7 @@ public class ParkingService : IParkingService
         return true;
     }
 
-    public async Task<ParkingSession?> EntryAsync(EntryRequest request)
+    public async Task<ParkingSession?> EntryAsync(EntryRequest request, int? effectiveUserId)
     {
         var slot = await _db.ParkingSlots.FindAsync(request.SlotId);
         if (slot is null || slot.Status == "Occupied") return null;
@@ -49,7 +81,7 @@ public class ParkingService : IParkingService
         {
             SlotId = slot.SlotId,
             VehicleId = vehicleId,
-            UserId = request.UserId,
+            UserId = effectiveUserId,
             EntryTime = DateTime.UtcNow,
             Status = "Active"
         };
@@ -83,7 +115,8 @@ public class ParkingService : IParkingService
             SessionId = session.SessionId,
             Amount = session.TotalAmount ?? 0,
             PaymentMethod = "Cash",
-            Status = "Pending"
+            Status = "Paid",
+            PaidAt = DateTime.UtcNow
         });
 
         await _db.SaveChangesAsync();

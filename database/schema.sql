@@ -2,6 +2,13 @@
 -- Smart Parking Management System
 -- Database Schema (SQL Server)
 -- =========================================================
+-- MVP tables currently wired into the backend API:
+-- Roles, Users, Vehicles, Zones, ParkingSlots, ParkingSessions,
+-- Reservations, Payments
+--
+-- Planned / next-phase tables kept in this schema for design continuity:
+-- Tariffs, SensorDevices, DeviceLogs, AnprLogs, AuditLogs
+--
 -- IMPLEMENTATION STEPS
 -- STEP 1: Core structure (roles, users, vehicles, zones, slots)
 -- STEP 2: Parking operations (sessions, reservations, payments, tariffs)
@@ -182,6 +189,9 @@ GO
 -- =========================================================
 -- STEP 3 - IoT integration
 -- =========================================================
+-- NOTE:
+-- Tabelat e ketij seksioni jane pjese e dizajnit te databazes,
+-- por nuk jane ende te lidhura plotesisht me backend-in aktual.
 -- 3.1 SensorDevices
 -- =========================================================
 -- SensorDevices
@@ -231,6 +241,8 @@ GO
 -- =========================================================
 -- STEP 4 - Administration and seeds
 -- =========================================================
+-- NOTE:
+-- `AuditLogs` mbetet per fazen tjeter; seed-et me poshte perdoren nga MVP.
 -- 4.1 AuditLogs
 -- =========================================================
 -- AuditLogs
@@ -274,10 +286,10 @@ BEGIN
 END
 GO
 
-IF NOT EXISTS (SELECT 1 FROM Roles WHERE Name = 'User')
+IF NOT EXISTS (SELECT 1 FROM Roles WHERE Name = 'Guest')
 BEGIN
     INSERT INTO Roles (Name, Description)
-    VALUES ('User', 'Perdorues standard i sistemit');
+    VALUES ('Guest', 'Perdorues mysafir i sistemit');
 END
 GO
 
@@ -298,21 +310,21 @@ GO
 IF NOT EXISTS (SELECT 1 FROM Zones WHERE Name = 'Zone A')
 BEGIN
     INSERT INTO Zones (Name, Location, Capacity, HourlyRate)
-    VALUES ('Zone A', 'Hyrja kryesore', 20, 1.00);
+    VALUES ('Zone A', 'Hyrja kryesore', 10, 1.00);
 END
 GO
 
 IF NOT EXISTS (SELECT 1 FROM Zones WHERE Name = 'Zone B')
 BEGIN
     INSERT INTO Zones (Name, Location, Capacity, HourlyRate)
-    VALUES ('Zone B', 'Pjesa qendrore', 20, 1.00);
+    VALUES ('Zone B', 'Pjesa qendrore', 10, 1.00);
 END
 GO
 
 IF NOT EXISTS (SELECT 1 FROM Zones WHERE Name = 'Zone C')
 BEGIN
     INSERT INTO Zones (Name, Location, Capacity, HourlyRate)
-    VALUES ('Zone C', 'Dalja dhe pjesa e pasme', 20, 1.00);
+    VALUES ('Zone C', 'Dalja dhe pjesa e pasme', 10, 1.00);
 END
 GO
 
@@ -331,17 +343,17 @@ BEGIN
 END
 GO
 
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'user.parking.iot.prishtine@gmail.com')
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'guest.parking.iot.prishtine@gmail.com')
 BEGIN
     INSERT INTO Users (FullName, Email, PhoneNumber, PasswordHash, RoleId, IsActive)
     SELECT
-        'User',
-        'user.parking.iot.prishtine@gmail.com',
+        'Guest',
+        'guest.parking.iot.prishtine@gmail.com',
         '+38349627415',
         '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         r.RoleId,
         1
     FROM Roles r
-    WHERE r.Name = 'User';
+    WHERE r.Name = 'Guest';
 END
 GO

@@ -16,7 +16,7 @@ const mockReservations = [
     slotNumber: "A2",
     startTime: "2026-04-23 09:00",
     endTime: "2026-04-23 11:00",
-    status: "ACTIVE",
+    status: "Confirmed",
   },
   {
     id: 102,
@@ -25,7 +25,7 @@ const mockReservations = [
     slotNumber: "B1",
     startTime: "2026-04-23 08:30",
     endTime: "2026-04-23 10:30",
-    status: "COMPLETED",
+    status: "Completed",
   },
 ];
 
@@ -41,7 +41,11 @@ async function withFallback(apiCall, mockValue) {
   try {
     const { data } = await apiCall();
     return { data, source: "api" };
-  } catch {
+  } catch (error) {
+    if (error.response) {
+      throw error;
+    }
+
     return { data: mockValue, source: "mock" };
   }
 }
@@ -55,5 +59,5 @@ export function fetchDashboardStats() {
 }
 
 export function fetchReservations() {
-  return Promise.resolve({ data: mockReservations, source: "mock" });
+  return withFallback(() => api.get("/reservations"), mockReservations);
 }

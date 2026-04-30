@@ -7,7 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "verify:backend": "dotnet build ./backend/SmartParking.API/SmartParking.API.csproj",
+    "verify:frontend": "npm --prefix frontend-web run build",
+    "test": "npm run verify:backend && npm run verify:frontend"
   },
   "keywords": [],
   "author": "",

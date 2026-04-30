@@ -9,26 +9,18 @@ Ky folder permban `ASP.NET Core Web API` te projektit.
 - `SQL Server`
 - `JWT Authentication`
 
-## Struktura e propozuar
+## Struktura aktuale
 
 ```text
 backend/
-├── SmartParking.API/          Controllers, Program.cs, appsettings
-├── SmartParking.Core/         Entities, DTOs, Interfaces
-├── SmartParking.Infrastructure/ EF Core, Repositories, DbContext
-├── SmartParking.Services/     Business logic (Auth, Parking, Payments)
-└── SmartParking.Tests/        Unit tests
+└── SmartParking.API/          Controllers, Services, Data, Models, appsettings
 ```
 
 ## Si te fillohet
 1. hap `Visual Studio` ose `VS Code`
-2. krijo projektin:
-   ```bash
-   dotnet new webapi -n SmartParking.API
-   ```
-3. shto `Entity Framework Core` dhe `JWT`
-4. lidh me databazen e krijuar ne folderin `database/`
-5. implemento endpoint-et e para
+2. konfiguro `Jwt:Key` dhe `Iot:DeviceApiKey`
+3. lidh backend-in me databazen e krijuar ne folderin `database/`
+4. nise API-ne me `dotnet run`
 
 ## Endpoints kryesore
 - `POST /api/auth/login`
@@ -38,6 +30,12 @@ backend/
 - `GET  /api/parking/available`
 - `POST /api/slots/update`
 - `GET  /api/dashboard/stats`
+
+## Konfigurime minimale
+- `Jwt:Key` duhet te jete sekret real me te pakten 32 karaktere
+- `Iot:DeviceApiKey` perdoret nga `POST /api/slots/update`
+- `Cors:AllowedOrigins` kontrollon origjinat e lejuara te frontend-it
+- `appsettings.example.json` tregon formen e konfigurimit
 
 ## Pergjegjes
 - `Personi 3` – `Auth`, `Users`, `Roles`, `Vehicles`

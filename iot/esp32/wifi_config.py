@@ -5,6 +5,8 @@ import time
 
 SSID = "YOUR_WIFI_NAME"
 PASSWORD = "YOUR_WIFI_PASSWORD"
+BACKEND_BASE_URL = "http://192.168.1.100:5000"
+DEVICE_API_KEY = "SET_SHARED_DEVICE_KEY"
 
 
 def connect_wifi(timeout: int = 15):

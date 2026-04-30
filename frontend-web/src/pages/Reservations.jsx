@@ -15,6 +15,16 @@ export default function Reservations() {
       .catch(() => setError("Gabim ne ngarkim te rezervimeve"));
   }, []);
 
+  const formatDateTime = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+
+    return new Intl.DateTimeFormat("sq-AL", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(date);
+  };
+
   return (
     <div>
       <h2>Reservations</h2>
@@ -40,10 +50,10 @@ export default function Reservations() {
               <tr key={r.id}>
                 <td>{r.id}</td>
                 <td>{r.fullName}</td>
-                <td>{r.plateNumber}</td>
+                <td>{r.plateNumber || "-"}</td>
                 <td>{r.slotNumber}</td>
-                <td>{r.startTime}</td>
-                <td>{r.endTime}</td>
+                <td>{formatDateTime(r.startTime)}</td>
+                <td>{formatDateTime(r.endTime)}</td>
                 <td>
                   <span className={`badge badge-${r.status.toLowerCase()}`}>
                     {r.status}

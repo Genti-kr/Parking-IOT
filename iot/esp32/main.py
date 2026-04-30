@@ -43,13 +43,18 @@ def read_distance_cm() -> float:
 def main():
     connect_wifi()
     print("ESP32 Smart Parking u nis.")
+    last_status = None
 
     while True:
         try:
             distance = read_distance_cm()
             status = "occupied" if distance < THRESHOLD_CM else "free"
             print(f"Distance: {distance:.1f} cm -> {status}")
-            send_status(SLOT_ID, status)
+            if status != last_status:
+                send_status(SLOT_ID, status)
+                last_status = status
+            else:
+                print("Statusi nuk ndryshoi, update nuk u dergua.")
         except Exception as exc:
             print("Gabim:", exc)
 

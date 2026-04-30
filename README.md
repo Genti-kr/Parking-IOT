@@ -45,6 +45,13 @@ Per te mbajtur projektin te realizueshem, versioni i pare (`MVP`) duhet te perfs
 - dashboard admin
 - shfaqjen e vendeve te lira
 
+Gjendja aktuale e MVP-se ne kod perfshin:
+- `Auth` me `JWT`
+- `Dashboard` me statistika baze
+- `Parking slots` dhe update te statusit nga `IoT`
+- `Reservations` ne lexim nga backend-i
+- `Payments` bazike ne dalje
+
 Fazat me te avancuara mund te perfshijne:
 
 - integrimin e plote me `IoT`
@@ -129,10 +136,10 @@ Shembull payload:
 }
 ```
 
-Endpoint i propozuar:
+Endpoint real:
 
 ```text
-POST /api/parking/slots/update
+POST /api/slots/update
 ```
 
 ## AI Layer - ANPR
@@ -164,12 +171,39 @@ Teknologjite e propozuara:
 - menaxhimi i perdoruesve dhe roleve
 - integrimi me sherbimet `AI` dhe `IoT`
 
-### Endpoints Kryesore
+### Endpoints Kryesore reale
+- `POST /api/auth/login`
+- `POST /api/auth/register`
 - `POST /api/slots/update`
 - `POST /api/entry`
 - `POST /api/exit`
 - `GET /api/dashboard/stats`
 - `GET /api/parking/available`
+- `GET /api/reservations`
+
+## Si testohet shpejt
+### Backend
+```bash
+dotnet build backend/SmartParking.API/SmartParking.API.csproj
+```
+
+Para nisjes se backend-it, konfiguro:
+- `Jwt:Key` me te pakten 32 karaktere
+- `Iot:DeviceApiKey` per `POST /api/slots/update`
+- `Cors:AllowedOrigins` sipas frontend-it lokal
+
+### Frontend
+```bash
+npm --prefix frontend-web run build
+```
+
+### IoT Simulator
+```bash
+set IOT_DEVICE_KEY=your_shared_key
+python iot/simulator/simulator.py --once --slot-id 1 --status occupied
+```
+
+Dokumenti i plote i kontrollave gjendet te `docs/qa-integration-checklist.md`.
 
 ## Database Design
 ### Tabelat Kryesore

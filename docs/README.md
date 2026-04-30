@@ -22,6 +22,11 @@ docs/
 - `API Documentation` (mund te jete `Swagger`)
 - `Test Plan`
 
+## Dokumente aktuale
+- `diagrams/er-diagram.md`
+- `qa-integration-checklist.md`
+- `project-status-summary.md`
+
 ## Mjete te rekomanduara
 - `draw.io` ose `diagrams.net` per diagrame
 - `Lucidchart` per UML

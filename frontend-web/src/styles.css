@@ -54,6 +54,18 @@ body {
   cursor: pointer;
 }
 .login-card button:disabled { opacity: 0.6; }
+.auth-switch {
+  margin: 16px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+  text-align: center;
+}
+.auth-switch a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-switch a:hover { text-decoration: underline; }
 
 /* Layout */
 .app-shell { display: flex; min-height: 100vh; }
@@ -75,6 +87,16 @@ body {
 }
 .sidebar nav a:hover { background: #1e293b; color: #fff; }
 .user-box { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+.role-chip {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #1e293b;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+}
 .user-box button {
   background: #ef4444;
   color: #fff;
@@ -100,6 +122,10 @@ body {
 }
 .stat-value { font-size: 28px; font-weight: 700; color: #2563eb; }
 .stat-label { color: #6b7280; margin-top: 4px; }
+.page-subtitle {
+  margin: 6px 0 0;
+  color: #6b7280;
+}
 
 /* Slots */
 .slots-grid {
@@ -165,4 +191,32 @@ body {
 .badge-completed {
   background: #e0e7ff;
   color: #3730a3;
+}
+.badge-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.badge-noshow {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    gap: 16px;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .login-card {
+    width: min(360px, calc(100vw - 32px));
+    padding: 24px;
+  }
 }

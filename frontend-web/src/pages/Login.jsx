@@ -1,22 +1,33 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    if (user) navigate("/dashboard", { replace: true });
+  }, [navigate, user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !password.trim()) {
+      setError("Ploteso email-in dhe password-in.");
+      return;
+    }
+
     setError("");
     setBusy(true);
     try {
-      await login(email, password);
-      navigate("/dashboard");
+      await login(normalizedEmail, password);
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || "Login i pasakte");
     } finally {
@@ -35,6 +46,7 @@ export default function Login() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
           required
         />
 
@@ -43,6 +55,7 @@ export default function Login() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
           required
         />
 
@@ -51,6 +64,10 @@ export default function Login() {
         <button type="submit" disabled={busy}>
           {busy ? "Duke u kyqur..." : "Kyqu"}
         </button>
+
+        <p className="auth-switch">
+          Nuk ke llogari? <Link to="/register">Regjistrohu</Link>
+        </p>
       </form>
     </div>
   );
