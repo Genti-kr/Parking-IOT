@@ -22,7 +22,6 @@ export default function Dashboard() {
     { label: "Totali i vendeve", value: stats.totalSlots },
     { label: "Te lira", value: stats.freeSlots },
     { label: "Te zena", value: stats.occupiedSlots },
-    { label: "Sesione aktive", value: stats.activeSessions },
     { label: "Te ardhurat sot", value: `${stats.revenueToday} EUR` },
   ];
 

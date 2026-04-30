@@ -15,7 +15,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var jwtKey = Environment.GetEnvironmentVariable("JWT__KEY")
-    ?? throw new InvalidOperationException("JWT__KEY is missing. Set it in .env.");
+    ?? builder.Configuration["Jwt:Key"];
+
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        jwtKey = "dev-local-jwt-key-change-this-before-production-123456";
+    }
+    else
+    {
+        throw new InvalidOperationException("JWT__KEY is missing. Set it in environment variables or appsettings.");
+    }
+}
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
 

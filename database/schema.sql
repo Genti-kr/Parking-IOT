@@ -9,10 +9,17 @@
 -- STEP 4: Administration and seed data
 -- =========================================================
 
+
 -- CREATE DATABASE parkingIOT;
 -- GO
 -- USE parkingIOT;
 -- GO
+
+ ---CREATE DATABASE parkingIOT;
+---- GO
+ ----USE parkingIOT;
+ ----GO
+
 
 -- =========================================================
 -- STEP 1 - Core structure
