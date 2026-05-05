@@ -38,6 +38,29 @@ public class ParkingService : IParkingService
             .ToListAsync();
     }
 
+<<<<<<< HEAD
+=======
+    public async Task<IEnumerable<AvailableSlotDto>> GetAvailableDetailedAsync()
+    {
+        return await _db.ParkingSlots
+            .Where(s => s.IsActive && s.Status == "Free")
+            .Join(
+                _db.Zones,
+                slot => slot.ZoneId,
+                zone => zone.ZoneId,
+                (slot, zone) => new AvailableSlotDto(
+                    slot.SlotId,
+                    slot.SlotNumber,
+                    slot.ZoneId,
+                    zone.Name,
+                    zone.HourlyRate,
+                    slot.Status))
+            .OrderBy(s => s.ZoneId)
+            .ThenBy(s => s.SlotNumber)
+            .ToListAsync();
+    }
+
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     public async Task<bool> UpdateSlotStatusAsync(SlotUpdateRequest request)
     {
         var slot = await _db.ParkingSlots.FindAsync(request.SlotId);
@@ -137,6 +160,34 @@ public class ParkingService : IParkingService
             .ToListAsync();
     }
 
+<<<<<<< HEAD
+=======
+    public async Task<IEnumerable<ReservationDto>> GetReservationsForUserAsync(int userId, string? status = null)
+    {
+        var query = _db.Reservations
+            .Where(r => r.UserId == userId)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            var normalizedStatus = NormalizeReservationStatus(status);
+            query = query.Where(r => r.Status == normalizedStatus);
+        }
+
+        return await query
+            .OrderByDescending(r => r.StartTime)
+            .Select(r => new ReservationDto(
+                r.ReservationId,
+                r.UserId,
+                r.SlotId,
+                r.VehicleId,
+                r.StartTime,
+                r.EndTime,
+                r.Status))
+            .ToListAsync();
+    }
+
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     public async Task<ReservationDto?> CreateReservationAsync(ReservationCreateRequest request)
     {
         if (request.EndTime <= request.StartTime) return null;
@@ -227,13 +278,118 @@ public class ParkingService : IParkingService
         var free = await _db.ParkingSlots.CountAsync(s => s.IsActive && s.Status == "Free");
         var occupied = await _db.ParkingSlots.CountAsync(s => s.IsActive && s.Status == "Occupied");
         var active = await _db.ParkingSessions.CountAsync(s => s.Status == "Active");
+<<<<<<< HEAD
+=======
+        var pendingReservations = await _db.Reservations.CountAsync(r => r.Status == "Pending");
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 
         var today = DateTime.UtcNow.Date;
         var revenue = await _db.Payments
             .Where(p => p.Status == "Paid" && p.PaidAt != null && p.PaidAt >= today)
             .SumAsync(p => (decimal?)p.Amount) ?? 0;
+<<<<<<< HEAD
 
         return new DashboardStats(total, free, occupied, active, revenue);
+=======
+        var reservationsToday = await _db.Reservations.CountAsync(r => r.StartTime >= today);
+
+        return new DashboardStats(total, free, occupied, active, revenue, pendingReservations, reservationsToday);
+    }
+
+    public async Task<IEnumerable<VehicleDto>> GetVehiclesForUserAsync(int userId)
+    {
+        return await _db.Vehicles
+            .Where(v => v.UserId == userId)
+            .OrderBy(v => v.VehicleId)
+            .Select(v => new VehicleDto(
+                v.VehicleId,
+                v.UserId,
+                v.PlateNumber,
+                v.Brand,
+                v.Model))
+            .ToListAsync();
+    }
+
+    public async Task<VehicleDto?> CreateVehicleAsync(int userId, VehicleUpsertRequest request)
+    {
+        var normalizedPlate = request.PlateNumber.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedPlate))
+        {
+            return null;
+        }
+
+        var exists = await _db.Vehicles.AnyAsync(v => v.PlateNumber == normalizedPlate);
+        if (exists)
+        {
+            return null;
+        }
+
+        var vehicle = new Vehicle
+        {
+            UserId = userId,
+            PlateNumber = normalizedPlate,
+            Brand = request.Brand?.Trim(),
+            Model = request.Model?.Trim()
+        };
+
+        _db.Vehicles.Add(vehicle);
+        await _db.SaveChangesAsync();
+
+        return new VehicleDto(
+            vehicle.VehicleId,
+            vehicle.UserId,
+            vehicle.PlateNumber,
+            vehicle.Brand,
+            vehicle.Model);
+    }
+
+    public async Task<VehicleDto?> UpdateVehicleAsync(int vehicleId, int userId, VehicleUpsertRequest request)
+    {
+        var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.VehicleId == vehicleId && v.UserId == userId);
+        if (vehicle is null)
+        {
+            return null;
+        }
+
+        var normalizedPlate = request.PlateNumber.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedPlate))
+        {
+            return null;
+        }
+
+        var duplicatePlate = await _db.Vehicles.AnyAsync(v =>
+            v.VehicleId != vehicleId && v.PlateNumber == normalizedPlate);
+        if (duplicatePlate)
+        {
+            return null;
+        }
+
+        vehicle.PlateNumber = normalizedPlate;
+        vehicle.Brand = request.Brand?.Trim();
+        vehicle.Model = request.Model?.Trim();
+
+        await _db.SaveChangesAsync();
+
+        return new VehicleDto(
+            vehicle.VehicleId,
+            vehicle.UserId,
+            vehicle.PlateNumber,
+            vehicle.Brand,
+            vehicle.Model);
+    }
+
+    public async Task<bool> DeleteVehicleAsync(int vehicleId, int userId)
+    {
+        var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.VehicleId == vehicleId && v.UserId == userId);
+        if (vehicle is null)
+        {
+            return false;
+        }
+
+        _db.Vehicles.Remove(vehicle);
+        await _db.SaveChangesAsync();
+        return true;
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     }
 
     private static decimal CalculateFee(DateTime entry, DateTime exit)

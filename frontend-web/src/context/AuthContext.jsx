@@ -8,9 +8,24 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+<<<<<<< HEAD
     const stored = localStorage.getItem("user");
     if (stored) setUser(JSON.parse(stored));
     setLoading(false);
+=======
+    try {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        setUser(JSON.parse(stored));
+      }
+    } catch {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
   }, []);
 
   const login = async (email, password) => {

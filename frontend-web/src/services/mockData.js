@@ -35,6 +35,11 @@ const mockStats = {
   occupiedSlots: 8,
   activeSessions: 5,
   revenueToday: 42.5,
+<<<<<<< HEAD
+=======
+  pendingReservations: 4,
+  reservationsToday: 7,
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 };
 
 async function withFallback(apiCall, mockValue) {
@@ -47,7 +52,11 @@ async function withFallback(apiCall, mockValue) {
 }
 
 export function fetchParkingSlots() {
+<<<<<<< HEAD
   return withFallback(() => api.get("/parking/available"), mockSlots);
+=======
+  return withFallback(() => api.get("/parking/slots"), mockSlots);
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 }
 
 export function fetchDashboardStats() {
@@ -55,5 +64,9 @@ export function fetchDashboardStats() {
 }
 
 export function fetchReservations() {
+<<<<<<< HEAD
   return Promise.resolve({ data: mockReservations, source: "mock" });
+=======
+  return withFallback(() => api.get("/reservations"), mockReservations);
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 }

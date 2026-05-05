@@ -30,7 +30,11 @@ export default function Login() {
       <div className="auth-bg-glow auth-bg-glow-2" />
       <form className="auth-card" onSubmit={handleSubmit}>
         <h2>Smart Parking</h2>
+<<<<<<< HEAD
         <p className="subtitle">Log in to the administration panel</p>
+=======
+        <p className="subtitle">Log in to your Smart Parking account</p>
+>>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 
         <label>Email</label>
         <input
