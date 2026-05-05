@@ -47,7 +47,7 @@ async function withFallback(apiCall, mockValue) {
 }
 
 export function fetchParkingSlots() {
-  return withFallback(() => api.get("/parking/slots"), mockSlots);
+  return withFallback(() => api.get("/parking/available"), mockSlots);
 }
 
 export function fetchDashboardStats() {
