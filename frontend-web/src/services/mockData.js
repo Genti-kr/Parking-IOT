@@ -1,11 +1,36 @@
 import api from "./api.js";
 
 const mockSlots = [
-  { slotId: 1, slotNumber: "A1", status: "FREE" },
-  { slotId: 2, slotNumber: "A2", status: "OCCUPIED" },
-  { slotId: 3, slotNumber: "A3", status: "FREE" },
-  { slotId: 4, slotNumber: "B1", status: "OCCUPIED" },
-  { slotId: 5, slotNumber: "B2", status: "FREE" },
+  { slotId: 1, slotNumber: "A1", zoneId: 1, status: "FREE" },
+  { slotId: 2, slotNumber: "A2", zoneId: 1, status: "FREE" },
+  { slotId: 3, slotNumber: "A3", zoneId: 1, status: "OUTOFSERVICE" },
+  { slotId: 4, slotNumber: "A4", zoneId: 1, status: "OCCUPIED" },
+  { slotId: 5, slotNumber: "A5", zoneId: 1, status: "OCCUPIED" },
+  { slotId: 6, slotNumber: "A6", zoneId: 1, status: "OCCUPIED" },
+  { slotId: 7, slotNumber: "A7", zoneId: 1, status: "OCCUPIED" },
+  { slotId: 8, slotNumber: "A8", zoneId: 1, status: "OUTOFSERVICE" },
+  { slotId: 9, slotNumber: "A9", zoneId: 1, status: "RESERVED" },
+  { slotId: 10, slotNumber: "A10", zoneId: 1, status: "RESERVED" },
+  { slotId: 11, slotNumber: "B1", zoneId: 2, status: "FREE" },
+  { slotId: 12, slotNumber: "B2", zoneId: 2, status: "RESERVED" },
+  { slotId: 13, slotNumber: "B3", zoneId: 2, status: "OUTOFSERVICE" },
+  { slotId: 14, slotNumber: "B4", zoneId: 2, status: "FREE" },
+  { slotId: 15, slotNumber: "B5", zoneId: 2, status: "RESERVED" },
+  { slotId: 16, slotNumber: "B6", zoneId: 2, status: "OCCUPIED" },
+  { slotId: 17, slotNumber: "B7", zoneId: 2, status: "FREE" },
+  { slotId: 18, slotNumber: "B8", zoneId: 2, status: "FREE" },
+  { slotId: 19, slotNumber: "B9", zoneId: 2, status: "RESERVED" },
+  { slotId: 20, slotNumber: "B10", zoneId: 2, status: "FREE" },
+  { slotId: 21, slotNumber: "C1", zoneId: 3, status: "FREE" },
+  { slotId: 22, slotNumber: "C2", zoneId: 3, status: "RESERVED" },
+  { slotId: 23, slotNumber: "C3", zoneId: 3, status: "OCCUPIED" },
+  { slotId: 24, slotNumber: "C4", zoneId: 3, status: "RESERVED" },
+  { slotId: 25, slotNumber: "C5", zoneId: 3, status: "RESERVED" },
+  { slotId: 26, slotNumber: "C6", zoneId: 3, status: "OUTOFSERVICE" },
+  { slotId: 27, slotNumber: "C7", zoneId: 3, status: "OUTOFSERVICE" },
+  { slotId: 28, slotNumber: "C8", zoneId: 3, status: "FREE" },
+  { slotId: 29, slotNumber: "C9", zoneId: 3, status: "RESERVED" },
+  { slotId: 30, slotNumber: "C10", zoneId: 3, status: "FREE" },
 ];
 
 const mockReservations = [
@@ -35,11 +60,8 @@ const mockStats = {
   occupiedSlots: 8,
   activeSessions: 5,
   revenueToday: 42.5,
-<<<<<<< HEAD
-=======
   pendingReservations: 4,
   reservationsToday: 7,
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 };
 
 async function withFallback(apiCall, mockValue) {
@@ -52,11 +74,18 @@ async function withFallback(apiCall, mockValue) {
 }
 
 export function fetchParkingSlots() {
-<<<<<<< HEAD
-  return withFallback(() => api.get("/parking/available"), mockSlots);
-=======
-  return withFallback(() => api.get("/parking/slots"), mockSlots);
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
+  return withFallback(
+    async () => {
+      const res = await api.get("/parking/slots");
+      const data = Array.isArray(res.data) ? res.data : [];
+      // If API is reachable but DB has no seeded slots yet, keep UI usable with mock slots.
+      if (data.length === 0) {
+        return { ...res, data: mockSlots };
+      }
+      return res;
+    },
+    mockSlots
+  );
 }
 
 export function fetchDashboardStats() {
@@ -64,9 +93,5 @@ export function fetchDashboardStats() {
 }
 
 export function fetchReservations() {
-<<<<<<< HEAD
-  return Promise.resolve({ data: mockReservations, source: "mock" });
-=======
   return withFallback(() => api.get("/reservations"), mockReservations);
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 }

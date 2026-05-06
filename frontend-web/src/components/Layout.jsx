@@ -1,16 +1,10 @@
-<<<<<<< HEAD
-import { Link, Outlet, useNavigate } from "react-router-dom";
-=======
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-<<<<<<< HEAD
-=======
   const isAdmin = (user?.role || "").toLowerCase() === "admin";
   const [openUserMenu, setOpenUserMenu] = useState(false);
   const initials = useMemo(() => {
@@ -19,7 +13,6 @@ export default function Layout() {
     if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     return source.slice(0, 2).toUpperCase();
   }, [user?.fullName, user?.email]);
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 
   const handleLogout = () => {
     logout();
@@ -28,20 +21,6 @@ export default function Layout() {
 
   return (
     <div className="app-shell">
-<<<<<<< HEAD
-      <aside className="sidebar">
-        <h1 className="brand">Smart Parking</h1>
-        <nav>
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/parking">Parking</Link>
-          <Link to="/reservations">Reservations</Link>
-        </nav>
-        <div className="user-box">
-          <span>{user?.fullName}</span>
-          <button onClick={handleLogout}>Dil</button>
-        </div>
-      </aside>
-=======
       <header className="top-nav">
         <div className="top-nav-brand">
           <span className="top-nav-brand-icon">🚘</span>
@@ -84,7 +63,6 @@ export default function Layout() {
           )}
         </div>
       </header>
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
       <main className="content">
         <Outlet />
       </main>
