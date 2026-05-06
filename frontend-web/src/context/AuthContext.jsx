@@ -31,6 +31,15 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const register = async ({ fullName, email, password, phoneNumber }) => {
+    const payload = { fullName, email, password, phoneNumber: phoneNumber || null };
+    const { data } = await api.post("/auth/register", payload);
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data));
+    setUser(data);
+    return data;
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");

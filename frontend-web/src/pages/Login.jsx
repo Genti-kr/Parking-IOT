@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
+=======
+import { useState } from "react";
+>>>>>>> c6b1066723ca95b0fe093273ea7321929b18a9d1
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -36,10 +40,12 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
-      <form className="login-card" onSubmit={handleSubmit}>
+    <div className="auth-page">
+      <div className="auth-bg-glow auth-bg-glow-1" />
+      <div className="auth-bg-glow auth-bg-glow-2" />
+      <form className="auth-card" onSubmit={handleSubmit}>
         <h2>Smart Parking</h2>
-        <p className="subtitle">Kyqu ne panelin e administrimit</p>
+        <p className="subtitle">Log in to the administration panel</p>
 
         <label>Email</label>
         <input
@@ -61,12 +67,19 @@ export default function Login() {
 
         {error && <div className="error">{error}</div>}
 
+<<<<<<< HEAD
         <button type="submit" disabled={busy}>
           {busy ? "Duke u kyqur..." : "Kyqu"}
         </button>
 
         <p className="auth-switch">
           Nuk ke llogari? <Link to="/register">Regjistrohu</Link>
+=======
+        <button type="submit" disabled={busy}>{busy ? "Signing in..." : "Log in"}</button>
+
+        <p className="auth-footer">
+          New here? <Link to="/register">Create an account</Link>
+>>>>>>> c6b1066723ca95b0fe093273ea7321929b18a9d1
         </p>
       </form>
     </div>
