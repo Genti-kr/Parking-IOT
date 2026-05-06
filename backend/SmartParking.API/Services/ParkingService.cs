@@ -38,8 +38,6 @@ public class ParkingService : IParkingService
             .ToListAsync();
     }
 
-<<<<<<< HEAD
-=======
     public async Task<IEnumerable<AvailableSlotDto>> GetAvailableDetailedAsync()
     {
         return await _db.ParkingSlots
@@ -60,7 +58,6 @@ public class ParkingService : IParkingService
             .ToListAsync();
     }
 
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     public async Task<bool> UpdateSlotStatusAsync(SlotUpdateRequest request)
     {
         var slot = await _db.ParkingSlots.FindAsync(request.SlotId);
@@ -160,8 +157,6 @@ public class ParkingService : IParkingService
             .ToListAsync();
     }
 
-<<<<<<< HEAD
-=======
     public async Task<IEnumerable<ReservationDto>> GetReservationsForUserAsync(int userId, string? status = null)
     {
         var query = _db.Reservations
@@ -187,7 +182,6 @@ public class ParkingService : IParkingService
             .ToListAsync();
     }
 
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     public async Task<ReservationDto?> CreateReservationAsync(ReservationCreateRequest request)
     {
         if (request.EndTime <= request.StartTime) return null;
@@ -278,19 +272,12 @@ public class ParkingService : IParkingService
         var free = await _db.ParkingSlots.CountAsync(s => s.IsActive && s.Status == "Free");
         var occupied = await _db.ParkingSlots.CountAsync(s => s.IsActive && s.Status == "Occupied");
         var active = await _db.ParkingSessions.CountAsync(s => s.Status == "Active");
-<<<<<<< HEAD
-=======
         var pendingReservations = await _db.Reservations.CountAsync(r => r.Status == "Pending");
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 
         var today = DateTime.UtcNow.Date;
         var revenue = await _db.Payments
             .Where(p => p.Status == "Paid" && p.PaidAt != null && p.PaidAt >= today)
             .SumAsync(p => (decimal?)p.Amount) ?? 0;
-<<<<<<< HEAD
-
-        return new DashboardStats(total, free, occupied, active, revenue);
-=======
         var reservationsToday = await _db.Reservations.CountAsync(r => r.StartTime >= today);
 
         return new DashboardStats(total, free, occupied, active, revenue, pendingReservations, reservationsToday);
@@ -389,7 +376,6 @@ public class ParkingService : IParkingService
         _db.Vehicles.Remove(vehicle);
         await _db.SaveChangesAsync();
         return true;
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     }
 
     private static decimal CalculateFee(DateTime entry, DateTime exit)

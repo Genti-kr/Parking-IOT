@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-<<<<<<< HEAD
-=======
 using System.Security.Claims;
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 using SmartParking.API.Models;
 using SmartParking.API.Services;
 
@@ -25,14 +22,11 @@ public class ParkingController : ControllerBase
     public async Task<IActionResult> GetAvailable()
         => Ok(await _parking.GetAvailableAsync());
 
-<<<<<<< HEAD
-=======
     [HttpGet("parking/available-detailed")]
     [Authorize]
     public async Task<IActionResult> GetAvailableDetailed()
         => Ok(await _parking.GetAvailableDetailedAsync());
 
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     [HttpPost("slots/update")]
     public async Task<IActionResult> UpdateSlot([FromBody] SlotUpdateRequest request)
     {
@@ -66,9 +60,6 @@ public class ParkingController : ControllerBase
     [HttpGet("reservations")]
     [Authorize]
     public async Task<IActionResult> GetReservations([FromQuery] string? status)
-<<<<<<< HEAD
-        => Ok(await _parking.GetReservationsAsync(status));
-=======
     {
         if (User.IsInRole(RoleNames.Admin))
         {
@@ -83,15 +74,11 @@ public class ParkingController : ControllerBase
 
         return Ok(await _parking.GetReservationsForUserAsync(userId, status));
     }
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 
     [HttpPost("reservations")]
     [Authorize]
     public async Task<IActionResult> CreateReservation([FromBody] ReservationCreateRequest request)
     {
-<<<<<<< HEAD
-        var result = await _parking.CreateReservationAsync(request);
-=======
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!int.TryParse(userIdClaim, out var userId))
         {
@@ -106,7 +93,6 @@ public class ParkingController : ControllerBase
             request.EndTime);
 
         var result = await _parking.CreateReservationAsync(requestWithAuthenticatedUser);
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
         return result is null
             ? BadRequest(new { message = "Rezervimi deshtoi: orari ose vendi nuk eshte valid." })
             : Ok(result);
@@ -121,8 +107,6 @@ public class ParkingController : ControllerBase
             ? NotFound(new { message = "Rezervimi nuk u gjet." })
             : Ok(result);
     }
-<<<<<<< HEAD
-=======
 
     [HttpGet("vehicles")]
     [Authorize]
@@ -185,5 +169,4 @@ public class ParkingController : ControllerBase
             : NotFound(new { message = "Vehicle not found." });
     }
 
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 }

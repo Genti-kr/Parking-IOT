@@ -8,15 +8,15 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-<<<<<<< HEAD
-    const stored = localStorage.getItem("user");
-    if (stored) setUser(JSON.parse(stored));
-    setLoading(false);
-=======
     try {
+      const token = localStorage.getItem("token");
       const stored = localStorage.getItem("user");
-      if (stored) {
+      if (stored && token && token !== "undefined" && token !== "null") {
         setUser(JSON.parse(stored));
+      } else {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        setUser(null);
       }
     } catch {
       localStorage.removeItem("user");
@@ -25,7 +25,6 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
   }, []);
 
   const login = async (email, password) => {

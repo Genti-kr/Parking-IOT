@@ -1,21 +1,4 @@
 import { useEffect, useState } from "react";
-<<<<<<< HEAD
-import { fetchDashboardStats } from "../services/mockData.js";
-
-export default function Dashboard() {
-  const [stats, setStats] = useState(null);
-  const [error, setError] = useState("");
-  const [source, setSource] = useState("api");
-  const [loading, setLoading] = useState(true);
-
-  const loadDashboard = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetchDashboardStats();
-      setStats(res.data);
-      setSource(res.source);
-=======
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api.js";
@@ -140,7 +123,6 @@ export default function Dashboard() {
         reservedSlots,
       });
       setSource(res.source === "mock" || slotsResponse.source === "mock" ? "mock" : "api");
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     } catch {
       setError("Gabim ne ngarkim");
     } finally {
@@ -149,13 +131,8 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-<<<<<<< HEAD
-    loadDashboard();
-  }, []);
-=======
     loadStats();
   }, [isAdmin]);
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
 
   if (loading) return <div className="loading">Duke u ngarkuar...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -165,76 +142,6 @@ export default function Dashboard() {
     stats.totalSlots > 0 ? Math.round((stats.occupiedSlots / stats.totalSlots) * 100) : 0;
   const availabilityRate =
     stats.totalSlots > 0 ? Math.round((stats.freeSlots / stats.totalSlots) * 100) : 0;
-<<<<<<< HEAD
-
-  const cards = [
-    {
-      label: "Totali i vendeve",
-      value: stats.totalSlots,
-      accent: "blue",
-    },
-    {
-      label: "Te lira",
-      value: stats.freeSlots,
-      accent: "green",
-    },
-    {
-      label: "Te zena",
-      value: stats.occupiedSlots,
-      accent: "amber",
-    },
-    {
-      label: "Sesione aktive",
-      value: stats.activeSessions,
-      accent: "purple",
-    },
-    {
-      label: "Te ardhurat sot",
-      value: `${Number(stats.revenueToday || 0).toFixed(2)} EUR`,
-      accent: "slate",
-    },
-  ];
-
-  const insights = [
-    { label: "Shfrytezimi", value: `${occupancyRate}%` },
-    { label: "Disponueshmeria", value: `${availabilityRate}%` },
-    { label: "Burimi i te dhenave", value: source === "mock" ? "Mock Data" : "API Live" },
-  ];
-
-  return (
-    <div className="dashboard-page">
-      <div className="dashboard-head">
-        <div>
-          <h2>Dashboard</h2>
-          <p className="dashboard-subtitle">Pamje e pergjithshme e parkingut ne kohe reale.</p>
-        </div>
-        <button className="dashboard-refresh-btn" type="button" onClick={loadDashboard}>
-          Rifresko
-        </button>
-      </div>
-
-      {source === "mock" && (
-        <p className="info-banner">Po shfaqen te dhena demo (mock data).</p>
-      )}
-
-      <div className="stats-grid">
-        {cards.map((c) => (
-          <article className={`stat-card stat-card-${c.accent}`} key={c.label}>
-            <div className="stat-label">{c.label}</div>
-            <div className="stat-value">{c.value}</div>
-          </article>
-        ))}
-      </div>
-
-      <div className="dashboard-insights">
-        {insights.map((item) => (
-          <div className="dashboard-insight-item" key={item.label}>
-            <span>{item.label}</span>
-            <strong>{item.value}</strong>
-          </div>
-        ))}
-      </div>
-=======
   const reservedRate =
     stats.totalSlots > 0 ? Math.round(((stats.reservedSlots || 0) / stats.totalSlots) * 100) : 0;
 
@@ -251,19 +158,20 @@ export default function Dashboard() {
 
   const userCards = [
     { label: "Available Slots", value: stats.freeSlots, tone: "green" },
-    { label: "Parking Occupancy", value: `${occupancyRate}%`, tone: "orange" },
-    { label: "Reserved Slots", value: stats.reservedSlots || 0, tone: "amber" },
+    { label: "Current Capacity", value: `${occupancyRate}%`, tone: "orange" },
     { label: "My Active Reservations", value: stats.activeSessions, tone: "purple" },
   ];
 
   const availableSlots = slots.filter((slot) => (slot.status || "").toLowerCase() === "free");
-  const groupedByZone = availableSlots.reduce((acc, slot) => {
+  const mapSlots = availableSlots.length > 0 ? availableSlots : slots;
+  const groupedByZone = mapSlots.reduce((acc, slot) => {
     const zone = slot.zoneId ?? "N/A";
     if (!acc[zone]) acc[zone] = [];
     acc[zone].push(slot);
     return acc;
   }, {});
   const sortedZones = Object.keys(groupedByZone).sort((a, b) => Number(a) - Number(b));
+  const showingFallbackFullMap = availableSlots.length === 0 && slots.length > 0;
 
   const sortSlotsNaturally = (a, b) => {
     const getNum = (slotNo) => Number((slotNo || "").replace(/^[A-Za-z]+/, "")) || 0;
@@ -302,10 +210,12 @@ export default function Dashboard() {
     return latestReservations.filter((r) => (r.status || "").toLowerCase() === latestStatusTab);
   })();
 
-  const openReserveModal = () => {
+  const openReserveModal = (preferredSlotId = null) => {
     setReserveError("");
     setReserveSuccess("");
-    const firstSlot = availableDetailedSlots[0];
+    const preferredSlot =
+      availableDetailedSlots.find((slot) => Number(slot.slotId) === Number(preferredSlotId)) || null;
+    const firstSlot = preferredSlot || availableDetailedSlots[0];
     setReserveForm({
       slotId: firstSlot ? String(firstSlot.slotId) : "",
       plateNumber: "",
@@ -423,7 +333,7 @@ export default function Dashboard() {
 
       <div className="dashboard-insights">
         <div className="insight-row">
-          <span>Parking occupancy</span>
+          <span>Parking Usage</span>
           <strong>{occupancyRate}%</strong>
         </div>
         <div className="progress-bar">
@@ -431,7 +341,7 @@ export default function Dashboard() {
         </div>
 
         <div className="insight-row">
-          <span>Availability</span>
+          <span>Available Spaces</span>
           <strong>{availabilityRate}%</strong>
         </div>
         <div className="progress-bar">
@@ -439,7 +349,7 @@ export default function Dashboard() {
         </div>
 
         <div className="insight-row">
-          <span>Reserved rate</span>
+          <span>Reserved Spaces</span>
           <strong>{reservedRate}%</strong>
         </div>
         <div className="progress-bar">
@@ -453,7 +363,7 @@ export default function Dashboard() {
             <h3>Interactive Parking Map</h3>
             <div className="dashboard-map-legend">
               <span className="legend-dot legend-free" />
-              <span>Available</span>
+              <span>{showingFallbackFullMap ? "All slots (no available now)" : "Available"}</span>
             </div>
           </div>
 
@@ -468,9 +378,14 @@ export default function Dashboard() {
                     .slice()
                     .sort(sortSlotsNaturally)
                     .map((slot) => (
-                      <div className="dashboard-slot dashboard-slot-free" key={slot.slotId}>
+                      <button
+                        type="button"
+                        className={`dashboard-slot dashboard-slot-${(slot.status || "free").toLowerCase()}`}
+                        key={slot.slotId}
+                        onClick={() => openReserveModal(slot.slotId)}
+                      >
                         {slot.slotNumber}
-                      </div>
+                      </button>
                     ))}
                 </div>
               </div>
@@ -650,6 +565,11 @@ export default function Dashboard() {
                 </div>
               )}
 
+              <div className="state-banner reserve-late-warning" role="alert">
+                <strong>Important:</strong> If you are more than 20 minutes late, your reservation will be removed
+                and the slot will no longer be available to you.
+              </div>
+
               <label>License Plate Number</label>
               <input
                 name="plateNumber"
@@ -742,7 +662,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
     </div>
   );
 }

@@ -1,28 +1,3 @@
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-import { fetchReservations } from "../services/mockData.js";
-
-export default function Reservations() {
-  const [reservations, setReservations] = useState([]);
-  const [error, setError] = useState("");
-  const [source, setSource] = useState("api");
-
-  useEffect(() => {
-    fetchReservations()
-      .then((res) => {
-        setReservations(res.data);
-        setSource(res.source);
-      })
-      .catch(() => setError("Gabim ne ngarkim te rezervimeve"));
-  }, []);
-
-  return (
-    <div>
-      <h2>Reservations</h2>
-      {source === "mock" && (
-        <p className="info-banner">Po shfaqen te dhena demo (mock data).</p>
-      )}
-=======
 import { useEffect, useMemo, useState } from "react";
 import api from "../services/api.js";
 import { fetchReservations } from "../services/mockData.js";
@@ -51,6 +26,12 @@ export default function Reservations() {
     { key: "all", label: "All" },
     { key: "pending", label: "Pending" },
     { key: "confirmed", label: "Confirmed" },
+    { key: "completed", label: "Completed" },
+    { key: "cancelled", label: "Cancelled" },
+  ];
+  const userReservationTabs = [
+    { key: "all", label: "All" },
+    { key: "active-upcoming", label: "Active / Upcoming" },
     { key: "completed", label: "Completed" },
     { key: "cancelled", label: "Cancelled" },
   ];
@@ -85,6 +66,24 @@ export default function Reservations() {
   }, []);
 
   const tabCounts = useMemo(() => {
+    if (!isAdmin) {
+      const counts = {
+        all: reservations.length,
+        "active-upcoming": 0,
+        completed: 0,
+        cancelled: 0,
+      };
+
+      reservations.forEach((r) => {
+        const key = (r.status || "").toLowerCase();
+        if (["pending", "confirmed", "active"].includes(key)) counts["active-upcoming"] += 1;
+        if (key === "completed") counts.completed += 1;
+        if (key === "cancelled" || key === "canceled") counts.cancelled += 1;
+      });
+
+      return counts;
+    }
+
     const counts = {
       all: reservations.length,
       pending: 0,
@@ -99,10 +98,15 @@ export default function Reservations() {
     });
 
     return counts;
-  }, [reservations]);
+  }, [reservations, isAdmin]);
 
   const filteredReservations = useMemo(() => {
     if (activeStatusTab === "all") return reservations;
+    if (activeStatusTab === "active-upcoming") {
+      return reservations.filter((r) =>
+        ["pending", "confirmed", "active"].includes((r.status || "").toLowerCase())
+      );
+    }
     return reservations.filter((r) => (r.status || "").toLowerCase() === activeStatusTab);
   }, [reservations, activeStatusTab]);
 
@@ -182,7 +186,7 @@ export default function Reservations() {
       )}
       <div className="reservation-toolbar">
         <div className="reserve-mode-tabs reservations-status-tabs">
-          {reservationTabs.map((tab) => (
+          {(isAdmin ? reservationTabs : userReservationTabs).map((tab) => (
             <button
               key={tab.key}
               type="button"
@@ -194,66 +198,54 @@ export default function Reservations() {
           ))}
         </div>
       </div>
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
       {error && <div className="error">{error}</div>}
       <div className="table-wrap">
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Perdoruesi</th>
-              <th>Targa</th>
-              <th>Vendi</th>
-              <th>Fillimi</th>
-              <th>Mbarimi</th>
-              <th>Statusi</th>
+              <th>Reservation ID</th>
+              <th>{isAdmin ? "User" : "Vehicle"}</th>
+              <th>Parking Slot</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Status</th>
+              {!isAdmin && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
-<<<<<<< HEAD
-            {reservations.map((r) => (
-              <tr key={r.id}>
-                <td>{r.id}</td>
-                <td>{r.fullName}</td>
-                <td>{r.plateNumber}</td>
-                <td>{r.slotNumber}</td>
-                <td>{r.startTime}</td>
-                <td>{r.endTime}</td>
-                <td>
-                  <span className={`badge badge-${r.status.toLowerCase()}`}>
-                    {r.status}
-=======
             {filteredReservations.map((r) => (
               <tr key={r.id ?? r.reservationId}>
                 <td>{r.id ?? r.reservationId}</td>
-                <td>{isAdmin ? (r.fullName || `User #${r.userId ?? "-"}`) : "You"}</td>
-                <td>{r.plateNumber}</td>
+                <td>
+                  {isAdmin
+                    ? (r.fullName || `User #${r.userId ?? "-"}`)
+                    : (r.plateNumber || (r.vehicleId ? `Vehicle #${r.vehicleId}` : "-"))}
+                </td>
                 <td>{r.slotNumber || `Slot #${r.slotId ?? "-"}`}</td>
                 <td>{r.startTime ? new Date(r.startTime).toLocaleString() : "-"}</td>
                 <td>{r.endTime ? new Date(r.endTime).toLocaleString() : "-"}</td>
                 <td>
                   <span className={`badge badge-${(r.status || "pending").toLowerCase()}`}>
                     {r.status || "Pending"}
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
                   </span>
                 </td>
+                {!isAdmin && (
+                  <td>
+                    {["pending", "confirmed", "active"].includes((r.status || "").toLowerCase())
+                      ? "Upcoming"
+                      : "-"}
+                  </td>
+                )}
               </tr>
             ))}
-<<<<<<< HEAD
-            {reservations.length === 0 && !error && (
-=======
             {filteredReservations.length === 0 && !error && (
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
               <tr>
-                <td colSpan={7}>Nuk ka rezervime per momentin.</td>
+                <td colSpan={isAdmin ? 6 : 7}>Nuk ka rezervime per momentin.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-<<<<<<< HEAD
-    </div>
-=======
       {isAdmin && (
         <>
           <div className="reservations-note state-banner state-info">
@@ -330,6 +322,5 @@ export default function Reservations() {
         </>
       )}
     </section>
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
   );
 }

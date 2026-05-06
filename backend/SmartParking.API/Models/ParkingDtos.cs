@@ -29,9 +29,6 @@ public record DashboardStats(
     int FreeSlots,
     int OccupiedSlots,
     int ActiveSessions,
-<<<<<<< HEAD
-    decimal RevenueToday);
-=======
     decimal RevenueToday,
     int PendingReservations,
     int ReservationsToday);
@@ -55,4 +52,3 @@ public record VehicleDto(
     string PlateNumber,
     string? Brand,
     string? Model);
->>>>>>> 7b27dd1 (Improved user dashboard, vehicles, and reservations layout and navigation)
